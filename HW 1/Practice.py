@@ -57,45 +57,51 @@ if __name__ == "__main__":
     connection = create_connection("cis3368.czszkhju4z7p.us-east-1.rds.amazonaws.com", "admin", "$Koid031", "cis3368db")
 
     if userOption == 'a':
+        insertName = input("What is your Full Name? (ex: John Doe): ")
         phoneNumber = input("Insert Phone Number (ex: XXX-XXX-XXXX): ")
         dateCreated = date.today()
-        insertQuery = "INSERT INTO contacts (contactDetails, creationDate) VALUES (phoneNumber, dateCreated)"
+        insertQuery = "INSERT INTO contacts (fullName, contactDetails, creationDate) VALUES ('%s', '%s', '%s')" % (insertName, phoneNumber, dateCreated)
         execute_query(connection, insertQuery)
-        print_menu()
 
     elif userOption == 'd':
         userID = input("Insert userID to DELETE: ")
         deleteQuery = "DELETE FROM contacts WHERE id = %s" % userID
         execute_query(connection, deleteQuery)
-        print_menu()
 
     elif userOption == 'u':
-        selectedID = input("Select userID to UPDATE: ")
+        selectedName = input("Full Name of the user you would like to UPDATE: ")
         updatedContact = input("Insert updated Phone Number (ex: XXX-XXX-XXXX): ")
         updateQuery = """
         UPDATE contacts
-        SET contactDetails = updatedContact
-        WHERE id = selectedID"""
+        SET fullName = '%s'
+        WHERE id = %s """ % (updatedContact, selectedName)
         execute_query(connection, updateQuery)
-        print_menu()
 
     elif userOption == 'b':
-        selectContacts = "SELECT * FROM contacts"
-        # contacts = execute_read_query(connection, selectContacts)
+        selectContacts = """
+        SELECT * FROM contacts
+        ORDER BY contacts.fullName ASC """
+        contacts = execute_read_query(connection, selectContacts)
+        for contact in contacts:
+            print(contact)
 
     elif userOption == 'c':
-        selectContacts = "SELECT * FROM contacts"
-        # contacts = execute_read_query(connection, selectContacts)
+        selectContacts = """
+        SELECT * FROM contacts
+        ORDER BY contacts.creationDate ASC """
+        contacts = execute_read_query(connection, selectContacts)
+        for contact in contacts:
+            print(contact)
 
     elif userOption == 'o':
         selectContacts = "SELECT * FROM contacts"
         contacts = execute_read_query(connection, selectContacts)
-        print(contacts)
-        print_menu()
+        for contact in contacts:
+            print(contact)
 
     elif userOption == 'q':
         print("Thank You. Please visit us again.")
+        exit()
 
     else:
         print("Sorry, please try again.")
-        print_menu()
